@@ -1,17 +1,12 @@
-import { useState } from "react"
-
 export function usePlayerName() {
-  const [playerName, setPlayerName] = useState<Player["name"] | undefined>(
-    localStorage.getItem("playerName") ?? undefined
-  )
+  let playerName = localStorage.getItem("playerName") ?? undefined
 
   if (!playerName) {
-    const promptPlayerName =
+    playerName =
       prompt(`Enter your username:`) ??
       `player@${Date.now().toString(36).substring(0, 5).toUpperCase()}`
 
-    setPlayerName(promptPlayerName)
-    localStorage.setItem("playerName", promptPlayerName)
+    localStorage.setItem("playerName", playerName)
   }
 
   return { playerName }
