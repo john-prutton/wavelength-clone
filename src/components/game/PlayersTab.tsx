@@ -12,7 +12,7 @@ export function PlayersTab() {
       <h2 className="text-xl font-bold mb-4">Players</h2>
 
       <div className="space-y-2">
-        {players
+        {[...players]
           .sort((a, b) => b.score - a.score)
           .map((player) => (
             <div
