@@ -1,9 +1,11 @@
+import { Board } from "./Board"
 import { PlayersTab } from "./PlayersTab"
 
 export function Game() {
   return (
-    <main className="grid grid-cols-2">
+    <main className="flex flex-row">
       <PlayersTab />
+      <Board />
     </main>
   )
 }
