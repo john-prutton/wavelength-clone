@@ -1,5 +1,14 @@
+import { Game } from "./components/Game"
+
 function App() {
-  return <div>hi</div>
+  const searchParams = new URLSearchParams(window.location.search)
+  const gameId = searchParams.get("game-id") ?? undefined
+
+  if (!gameId) {
+    return <div>error no game id found</div>
+  }
+
+  return <Game gameId={gameId} />
 }
 
 export default App
