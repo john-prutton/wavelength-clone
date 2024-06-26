@@ -1,16 +1,30 @@
+import { useState } from "react"
+
 export function Board() {
+  const [pinRotation, setPinRotation] = useState(0)
+
+  const handleClick = ({
+    currentTarget,
+    clientX,
+    clientY,
+  }: React.MouseEvent<SVGSVGElement, MouseEvent>) => {
+    const { left, top, width, height } = currentTarget.getBoundingClientRect()
+
+    const x = left + width / 2
+    const y = top + height
+
+    const angle = Math.atan2(x - clientX, y - clientY) * (180 / Math.PI)
+    setPinRotation(angle)
+  }
   return (
     <section className="w-full flex items-center">
-      <svg className="w-full aspect-video max-h-svh" viewBox="0 0 100 50">
+      <svg
+        className="w-full max-h-svh"
+        viewBox="0 0 100 50"
+        onMouseUp={handleClick}
+      >
         <defs>
-          <mask
-            id="semi-circle-mask"
-            maskUnits="userSpaceOnUse"
-            x="0"
-            y="0"
-            width="100"
-            height="50"
-          >
+          <mask id="semi-circle-mask">
             <path
               d="M100 50H0C0 50 0 0 51.6854 0C100 0 100 50 100 50Z"
               fill="white"
@@ -32,8 +46,10 @@ export function Board() {
           </g>
         </g>
 
-        <g className="fill-red-500 stroke-red-500 origin-bottom rotate-45">
-          <circle fill="inherit" cx={50} cy={50} r={2.5} />
+        <g
+          className="fill-red-500 stroke-red-500 origin-bottom"
+          style={{ rotate: `${-pinRotation}deg` }}
+        >
           <line
             x1={50}
             y1={50}
@@ -42,6 +58,7 @@ export function Board() {
             className="stroke-1"
             stroke="inherit"
           />
+          <circle fill="inherit" cx={50} cy={50} r={1} />
         </g>
       </svg>
     </section>
