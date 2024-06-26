@@ -1,5 +1,6 @@
 type GameState = {
   players: Player[]
+  currentPlayer: string | undefined
 }
 
 type Player = {

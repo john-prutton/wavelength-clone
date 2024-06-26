@@ -7,6 +7,7 @@ type GameStore = GameState & {
   initialize: (gameId: string | undefined) => Promise<void>
   addPlayer: (playerName: Player["name"]) => Promise<void>
   removePlayer: (playerName: Player["name"]) => Promise<void>
+  startGame: () => Promise<void>
 }
 
 const gameCollection = pb.collection<RecordModel & { state: GameState }>(
@@ -16,6 +17,7 @@ const gameCollection = pb.collection<RecordModel & { state: GameState }>(
 export const useGameStore = create<GameStore>()((set, get) => ({
   id: undefined,
   players: [],
+  currentPlayer: undefined,
 
   initialize: async (gameId) => {
     if (!gameId) return set({ id: undefined, players: [] })
@@ -23,36 +25,60 @@ export const useGameStore = create<GameStore>()((set, get) => ({
     const game = await gameCollection.getOne(gameId).catch(() => undefined)
     if (!game) return set({ id: undefined, players: [] })
 
-    set({ id: game.id, players: game.state.players })
+    set({ id: game.id, ...game.state })
   },
 
   addPlayer: async (playerName) => {
-    const { players, id } = get()
-    if (!id || players.findIndex((p) => p.name === playerName) !== -1) return
+    const gameState = get()
+    if (
+      !gameState.id ||
+      gameState.players.findIndex((p) => p.name === playerName) !== -1
+    )
+      return
 
     const newState: GameState = {
-      players: [...players, { name: playerName, score: 0 }],
+      ...gameState,
+      players: [...gameState.players, { name: playerName, score: 0 }],
     }
 
-    await gameCollection.update(id, { state: newState })
+    await gameCollection.update(gameState.id, { state: newState })
 
-    set(() => {
-      return newState
-    })
+    set(newState)
   },
 
   removePlayer: async (playerName) => {
-    const { players, id } = get()
-    if (!id || players.findIndex((p) => p.name === playerName) === -1) return
+    const gameState = get()
+    if (
+      !gameState.id ||
+      gameState.players.findIndex((p) => p.name === playerName) === -1
+    )
+      return
+
+    if (gameState.currentPlayer === playerName)
+      return alert(`${playerName} can't leave the game while it's their turn`)
 
     const newState: GameState = {
-      players: players.filter((p) => p.name !== playerName),
+      ...gameState,
+      players: gameState.players.filter((p) => p.name !== playerName),
     }
 
-    await gameCollection.update(id, { state: newState })
+    await gameCollection.update(gameState.id, { state: newState })
 
-    set(() => {
-      return newState
-    })
+    set(newState)
+  },
+
+  startGame: async () => {
+    const gameState = get()
+    if (!gameState.id || gameState.players.length < 2)
+      return alert("You need at least 2 players to start the game")
+
+    const newState: GameState = {
+      ...gameState,
+      currentPlayer: gameState.players[0].name,
+    }
+
+    await gameCollection.update(gameState.id, { state: newState })
+
+    set(newState)
   },
 }))
