@@ -11,3 +11,8 @@ dist-ssr
 # Editor directories and files
 .idea
 .DS_Store
+
+
+pocketbase.exe
+pb_data/
+pb_migrations/
