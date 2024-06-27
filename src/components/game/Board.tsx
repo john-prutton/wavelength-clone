@@ -1,6 +1,8 @@
+import { useGameStore } from "@/lib/stores/game-store"
 import { useState } from "react"
 
 export function Board() {
+  const { card } = useGameStore()
   const [pinRotation, setPinRotation] = useState(0)
 
   const handleClick = ({
@@ -17,7 +19,17 @@ export function Board() {
     setPinRotation(angle)
   }
   return (
-    <section className="w-full flex items-center">
+    <section className="relative w-full flex items-center">
+      {card && (
+        <>
+          <span className="absolute left-0 bottom-0 text-green-400">
+            {card.left}
+          </span>
+          <span className="absolute right-0 bottom-0 text-green-400">
+            {card.right}
+          </span>
+        </>
+      )}
       <svg
         className="w-full max-h-svh"
         viewBox="0 0 100 50"

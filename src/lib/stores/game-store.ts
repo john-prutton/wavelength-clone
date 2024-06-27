@@ -18,9 +18,16 @@ export const useGameStore = create<GameStore>()((set, get) => ({
   id: undefined,
   players: [],
   currentPlayer: undefined,
+  card: undefined,
 
   initialize: async (gameId) => {
-    if (!gameId) return set({ id: undefined, players: [] })
+    if (!gameId)
+      return set({
+        id: undefined,
+        players: [],
+        currentPlayer: undefined,
+        card: undefined,
+      })
 
     const game = await gameCollection.getOne(gameId).catch(() => undefined)
     if (!game) return set({ id: undefined, players: [] })
@@ -72,9 +79,14 @@ export const useGameStore = create<GameStore>()((set, get) => ({
     if (!gameState.id || gameState.players.length < 2)
       return alert("You need at least 2 players to start the game")
 
+    const cards = await pb.collection<RecordModel & Card>("cards").getFullList()
+    const randomIndex = Math.floor(Math.random() * cards.length)
+    const { left, right } = cards[randomIndex]
+
     const newState: GameState = {
       ...gameState,
       currentPlayer: gameState.players[0].name,
+      card: { left, right },
     }
 
     await gameCollection.update(gameState.id, { state: newState })
