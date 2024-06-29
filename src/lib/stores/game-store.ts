@@ -8,6 +8,7 @@ type GameStore = GameState & {
   addPlayer: (playerName: Player["name"]) => Promise<void>
   removePlayer: (playerName: Player["name"]) => Promise<void>
   startGame: () => Promise<void>
+  handleUpdate: (gameState: GameState) => void
 }
 
 const gameCollection = pb.collection<RecordModel & { state: GameState }>(
@@ -93,4 +94,6 @@ export const useGameStore = create<GameStore>()((set, get) => ({
 
     set(newState)
   },
+
+  handleUpdate: (gameState) => set(gameState),
 }))
